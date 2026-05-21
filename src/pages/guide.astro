@@ -1,0 +1,477 @@
+---
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>How to Edit Your Site — Freddie's Guide</title>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+
+      body {
+        background: #0d0d0d;
+        color: #c8c8c8;
+        font-family: Georgia, serif;
+        min-height: 100vh;
+        padding: 60px 24px 100px;
+      }
+
+      .container { max-width: 720px; margin: 0 auto; }
+
+      .back {
+        font-family: monospace;
+        font-size: 0.75rem;
+        color: #2e6040;
+        text-decoration: none;
+        letter-spacing: 2px;
+        display: inline-block;
+        margin-bottom: 48px;
+      }
+      .back:hover { color: #00ff88; }
+
+      .label {
+        font-family: monospace;
+        font-size: 0.7rem;
+        letter-spacing: 3px;
+        color: #00ff88;
+        text-transform: uppercase;
+        margin-bottom: 12px;
+      }
+
+      h1 {
+        font-size: 2rem;
+        color: #e8e8e8;
+        line-height: 1.2;
+        margin-bottom: 12px;
+      }
+
+      .intro {
+        color: #666;
+        font-family: monospace;
+        font-size: 0.8rem;
+        letter-spacing: 1px;
+        margin-bottom: 60px;
+      }
+
+      .step {
+        margin-bottom: 56px;
+        border-left: 3px solid #1a3d2a;
+        padding-left: 28px;
+      }
+
+      .step-num {
+        font-family: monospace;
+        font-size: 0.65rem;
+        color: #00ff88;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        margin-bottom: 8px;
+      }
+
+      h2 {
+        font-size: 1.2rem;
+        color: #e8e8e8;
+        margin-bottom: 16px;
+      }
+
+      p {
+        font-size: 0.95rem;
+        line-height: 1.85;
+        color: #999;
+        margin-bottom: 14px;
+      }
+
+      .file-path {
+        font-family: monospace;
+        font-size: 0.8rem;
+        color: #00ff88;
+        background: #0b1e0f;
+        border: 1px solid #1a3d2a;
+        border-radius: 4px;
+        padding: 2px 8px;
+        display: inline-block;
+        margin-bottom: 16px;
+      }
+
+      .code-block {
+        background: #111;
+        border: 1px solid #1a3d2a;
+        border-radius: 6px;
+        padding: 20px 24px;
+        margin: 16px 0;
+        font-family: monospace;
+        font-size: 0.82rem;
+        line-height: 1.7;
+        color: #c8c8c8;
+        overflow-x: auto;
+        position: relative;
+      }
+
+      .code-block .comment { color: #2e6040; }
+      .code-block .key { color: #00ff88; }
+      .code-block .value { color: #88ccaa; }
+      .code-block .heading { color: #e8e8e8; font-weight: bold; }
+      .code-block .bold { color: #e8b88a; }
+      .code-block .link { color: #88aaee; }
+
+      .try-it {
+        background: #0b1e0f;
+        border: 1px dashed #1a3d2a;
+        border-radius: 6px;
+        padding: 20px 24px;
+        margin: 20px 0;
+      }
+
+      .try-it-label {
+        font-family: monospace;
+        font-size: 0.65rem;
+        color: #00ff88;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        margin-bottom: 10px;
+      }
+
+      .try-it p { color: #8ab898; margin-bottom: 0; }
+
+      .cheatsheet {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin: 20px 0;
+      }
+
+      .cheat-row {
+        background: #111;
+        border: 1px solid #1a3d2a;
+        border-radius: 4px;
+        padding: 10px 14px;
+        font-family: monospace;
+        font-size: 0.78rem;
+      }
+
+      .cheat-syntax { color: #00ff88; margin-bottom: 4px; }
+      .cheat-result { color: #666; font-size: 0.72rem; }
+
+      .terminal {
+        background: #080808;
+        border: 1px solid #1a3d2a;
+        border-radius: 6px;
+        padding: 20px 24px;
+        margin: 16px 0;
+        font-family: monospace;
+        font-size: 0.82rem;
+        line-height: 1.9;
+      }
+
+      .terminal .prompt { color: #2e6040; }
+      .terminal .cmd { color: #00ff88; }
+      .terminal .out { color: #444; }
+
+      .interactive-demo {
+        background: #111;
+        border: 1px solid #1a3d2a;
+        border-radius: 6px;
+        padding: 24px;
+        margin: 20px 0;
+      }
+
+      .demo-label {
+        font-family: monospace;
+        font-size: 0.65rem;
+        color: #2e6040;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        margin-bottom: 14px;
+      }
+
+      .demo-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        align-items: start;
+      }
+
+      .demo-input {
+        width: 100%;
+        background: #080808;
+        border: 1px solid #1a3d2a;
+        border-radius: 4px;
+        padding: 12px;
+        font-family: monospace;
+        font-size: 0.8rem;
+        color: #c8c8c8;
+        resize: vertical;
+        min-height: 120px;
+        outline: none;
+      }
+
+      .demo-input:focus { border-color: #00ff88; }
+
+      .demo-preview {
+        background: #0b1e0f;
+        border: 1px solid #1a3d2a;
+        border-radius: 4px;
+        padding: 12px;
+        min-height: 120px;
+        font-size: 0.88rem;
+        line-height: 1.7;
+        color: #b8b8b8;
+      }
+
+      .demo-preview h1, .demo-preview h2, .demo-preview h3 {
+        color: #e8e8e8;
+        margin-bottom: 8px;
+      }
+      .demo-preview h1 { font-size: 1.3rem; }
+      .demo-preview h2 { font-size: 1.1rem; }
+      .demo-preview h3 { font-size: 0.95rem; }
+      .demo-preview p { margin-bottom: 8px; color: #b8b8b8; font-size: 0.88rem; }
+      .demo-preview strong { color: #e8b88a; }
+      .demo-preview em { color: #88ccaa; }
+      .demo-preview ul { padding-left: 20px; margin-bottom: 8px; }
+      .demo-preview li { color: #b8b8b8; font-size: 0.88rem; margin-bottom: 2px; }
+      .demo-preview a { color: #88aaee; }
+
+      .callout {
+        background: #0b1e0f;
+        border-left: 3px solid #00ff88;
+        border-radius: 0 4px 4px 0;
+        padding: 14px 18px;
+        margin: 16px 0;
+        font-family: monospace;
+        font-size: 0.8rem;
+        color: #8ab898;
+      }
+
+      @media (max-width: 600px) {
+        .cheatsheet { grid-template-columns: 1fr; }
+        .demo-row { grid-template-columns: 1fr; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <a class="back" href="/">← back</a>
+
+      <div class="label">// how to edit your site</div>
+      <h1>Adding Content to Your Site</h1>
+      <div class="intro">a guide to markdown, frontmatter, and getting changes live</div>
+
+      <!-- STEP 1 -->
+      <div class="step">
+        <div class="step-num">Step 01</div>
+        <h2>Find the right file</h2>
+        <p>Your site's content lives in the <code style="color:#00ff88;background:#111;padding:1px 5px;border-radius:3px;">src/content/</code> folder. There are two sub-folders:</p>
+        <div class="code-block">
+          <span class="comment">your content files</span><br>
+          src/<br>
+          &nbsp;&nbsp;content/<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;diary/<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="key">tuesday.md</span> &nbsp;&nbsp;&nbsp;<span class="comment">← your first day</span><br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="key">wednesday.md</span> &nbsp;<span class="comment">← your second day</span><br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="key">thursday.md</span> &nbsp;&nbsp;<span class="comment">← your third day</span><br>
+          &nbsp;&nbsp;&nbsp;&nbsp;revision/<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="key">macbeth.md</span> &nbsp;&nbsp;&nbsp;<span class="comment">← revision notes</span>
+        </div>
+        <p>Open one of these in VS Code. Everything you edit in these files will appear on your live site after you push to GitHub.</p>
+      </div>
+
+      <!-- STEP 2 -->
+      <div class="step">
+        <div class="step-num">Step 02</div>
+        <h2>Understand frontmatter</h2>
+        <p>At the top of every <code style="color:#00ff88;background:#111;padding:1px 5px;border-radius:3px;">.md</code> file you'll see a block between two sets of <code style="color:#00ff88;background:#111;padding:1px 5px;border-radius:3px;">---</code> lines. This is called <strong style="color:#e8b88a;">frontmatter</strong> — it's metadata about the entry, not the entry itself.</p>
+
+        <div class="code-block">
+<span class="comment">--- ← frontmatter starts here</span>
+<span class="key">title:</span> <span class="value">"Foundations & First Win"</span>
+<span class="key">date:</span> <span class="value">2026-05-20</span>
+<span class="key">tags:</span> <span class="value">["html", "setup", "first-commit"]</span>
+<span class="comment">--- ← frontmatter ends here</span>
+
+Your actual diary content goes here.
+Everything below the second --- is what
+appears on the page.
+        </div>
+
+        <div class="callout">
+          The <code>title</code> shows as the heading on your diary page. The <code>date</code> controls the order entries appear and how the date is displayed. The <code>tags</code> are the little green pills you see on each card.
+        </div>
+
+        <p>Don't change the structure of the frontmatter — just update the values inside the quotes.</p>
+      </div>
+
+      <!-- STEP 3 -->
+      <div class="step">
+        <div class="step-num">Step 03</div>
+        <h2>Write in Markdown</h2>
+        <p>Below the frontmatter, you write in <strong style="color:#e8b88a;">Markdown</strong> — a simple way of formatting text using plain characters. Here's everything you'll need:</p>
+
+        <div class="cheatsheet">
+          <div class="cheat-row">
+            <div class="cheat-syntax"># Big heading</div>
+            <div class="cheat-result">→ large title</div>
+          </div>
+          <div class="cheat-row">
+            <div class="cheat-syntax">## Medium heading</div>
+            <div class="cheat-result">→ section heading</div>
+          </div>
+          <div class="cheat-row">
+            <div class="cheat-syntax">**bold text**</div>
+            <div class="cheat-result">→ <strong>bold text</strong></div>
+          </div>
+          <div class="cheat-row">
+            <div class="cheat-syntax">*italic text*</div>
+            <div class="cheat-result">→ <em>italic text</em></div>
+          </div>
+          <div class="cheat-row">
+            <div class="cheat-syntax">- item one<br>- item two</div>
+            <div class="cheat-result">→ bullet list</div>
+          </div>
+          <div class="cheat-row">
+            <div class="cheat-syntax">1. first<br>2. second</div>
+            <div class="cheat-result">→ numbered list</div>
+          </div>
+          <div class="cheat-row">
+            <div class="cheat-syntax">`inline code`</div>
+            <div class="cheat-result">→ <code style="color:#00ff88">inline code</code></div>
+          </div>
+          <div class="cheat-row">
+            <div class="cheat-syntax">[text](url)</div>
+            <div class="cheat-result">→ <a style="color:#88aaee">clickable link</a></div>
+          </div>
+        </div>
+
+        <p>A blank line between paragraphs creates a new paragraph. You don't need any special syntax for that — just press Enter twice.</p>
+      </div>
+
+      <!-- INTERACTIVE DEMO -->
+      <div class="step">
+        <div class="step-num">Try it</div>
+        <h2>Live Markdown preview</h2>
+        <p>Type in the left box and see how it renders on the right. This is exactly what your content will look like (roughly).</p>
+
+        <div class="interactive-demo">
+          <div class="demo-label">// edit on the left, preview on the right</div>
+          <div class="demo-row">
+            <textarea class="demo-input" id="md-input" spellcheck="false" placeholder="Start typing Markdown here...">## My Day
+
+Today I learned about **Markdown** and how to write *formatted text* using plain characters.
+
+The best bit was:
+
+- No complicated buttons
+- Just type and it looks good
+- Anyone can learn it in 10 minutes
+
+I also learned about `git commit` which saves your work.</textarea>
+            <div class="demo-preview" id="md-preview"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 4 -->
+      <div class="step">
+        <div class="step-num">Step 04</div>
+        <h2>Save, commit, push</h2>
+        <p>Once you've edited a <code style="color:#00ff88;background:#111;padding:1px 5px;border-radius:3px;">.md</code> file, you need to tell Git about the change and push it to GitHub. Coolify watches your repo and redeploys automatically when it sees a new commit.</p>
+
+        <p>Open the terminal in VS Code (press <code style="color:#00ff88;background:#111;padding:1px 5px;border-radius:3px;">Ctrl+`</code> on Windows, <code style="color:#00ff88;background:#111;padding:1px 5px;border-radius:3px;">Cmd+`</code> on Mac) and run these three commands:</p>
+
+        <div class="terminal">
+          <span class="prompt">$ </span><span class="cmd">git add src/content/diary/thursday.md</span><br>
+          <span class="out">← stages the file (marks it to be saved)</span><br><br>
+          <span class="prompt">$ </span><span class="cmd">git commit -m "Add Thursday diary entry"</span><br>
+          <span class="out">← creates a snapshot with a description</span><br><br>
+          <span class="prompt">$ </span><span class="cmd">git push</span><br>
+          <span class="out">← sends it to GitHub → site rebuilds automatically</span>
+        </div>
+
+        <div class="callout">
+          Replace <code>thursday.md</code> with whichever file you edited. The commit message in quotes is just a description for yourself — make it something that describes what you changed.
+        </div>
+
+        <p>After pushing, wait about 30–60 seconds and then refresh your live site. The change will be there.</p>
+      </div>
+
+      <!-- STEP 5 -->
+      <div class="step">
+        <div class="step-num">Step 05</div>
+        <h2>Adding a new diary day</h2>
+        <p>To add a completely new entry, create a new <code style="color:#00ff88;background:#111;padding:1px 5px;border-radius:3px;">.md</code> file in <code style="color:#00ff88;background:#111;padding:1px 5px;border-radius:3px;">src/content/diary/</code>. Copy the frontmatter from an existing file and change the title, date, and tags.</p>
+
+        <div class="code-block">
+<span class="comment">src/content/diary/friday.md</span>
+
+<span class="comment">---</span>
+<span class="key">title:</span> <span class="value">"My New Entry"</span>
+<span class="key">date:</span> <span class="value">2026-05-22</span>
+<span class="key">tags:</span> <span class="value">["tag1", "tag2"]</span>
+<span class="comment">---</span>
+
+Write your content here. Astro picks up
+the file automatically — no code changes needed.
+        </div>
+
+        <p>Astro reads all files in the <code style="color:#00ff88;background:#111;padding:1px 5px;border-radius:3px;">diary/</code> folder automatically, so a new file just appears in the list on the home page. You don't need to touch any other code.</p>
+      </div>
+
+      <!-- RECAP -->
+      <div class="step">
+        <div class="step-num">Recap</div>
+        <h2>The full loop</h2>
+        <div class="terminal">
+          <span class="out">1. Open a .md file in src/content/diary/</span><br>
+          <span class="out">2. Edit the content below the --- frontmatter</span><br>
+          <span class="out">3. Save the file (Ctrl+S / Cmd+S)</span><br>
+          <span class="out">4. git add → git commit → git push</span><br>
+          <span class="out">5. Wait ~60s → refresh freddiemason.dev</span>
+        </div>
+        <p>That's it. Everything else — the build, the deploy, the server — happens automatically. Your job is just the content.</p>
+      </div>
+
+    </div>
+
+    <script>
+      const input = document.getElementById('md-input');
+      const preview = document.getElementById('md-preview');
+
+      function parseMarkdown(text) {
+        return text
+          .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+          .split('\n\n').map(block => {
+            const lines = block.split('\n');
+            if (/^#{1,3} /.test(lines[0])) {
+              return lines.map(l => {
+                const m = l.match(/^(#{1,3}) (.+)/);
+                if (!m) return l;
+                const tag = ['h1','h2','h3'][m[1].length - 1];
+                return `<${tag}>${inline(m[2])}</${tag}>`;
+              }).join('');
+            }
+            if (lines.every(l => /^[-*] /.test(l.trim()))) {
+              return '<ul>' + lines.map(l => `<li>${inline(l.replace(/^[-*] /, ''))}</li>`).join('') + '</ul>';
+            }
+            if (lines.every(l => /^\d+\. /.test(l.trim()))) {
+              return '<ol>' + lines.map(l => `<li>${inline(l.replace(/^\d+\. /, ''))}</li>`).join('') + '</ol>';
+            }
+            if (block.trim()) return `<p>${inline(block)}</p>`;
+            return '';
+          }).join('');
+      }
+
+      function inline(text) {
+        return text
+          .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+          .replace(/\*(.+?)\*/g, '<em>$1</em>')
+          .replace(/`(.+?)`/g, '<code style="color:#00ff88;background:#080808;padding:1px 4px;border-radius:2px">$1</code>')
+          .replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2">$1</a>');
+      }
+
+      function update() { preview.innerHTML = parseMarkdown(input.value); }
+      input.addEventListener('input', update);
+      update();
+    </script>
+  </body>
+</html>

@@ -1,6 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 
+const diary = (await getCollection('diary')).sort((a, b) => a.data.date.valueOf() - b.data.date.valueOf());
 const revision = await getCollection('revision');
 ---
 
@@ -59,9 +60,20 @@ const revision = await getCollection('revision');
 
       <section>
         <h2>Diary</h2>
-        <a class="card" href="/diary/wednesday">
-          <div class="card-title">Foundations &amp; First Win</div>
-          <div class="card-meta">Wednesday, 20 May 2026</div>
+        {diary.map(entry => (
+          <a class="card" href={`/diary/${entry.id}`}>
+            <div class="card-title">{entry.data.title}</div>
+            <div class="card-meta">{entry.data.date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</div>
+            <div class="tags">{entry.data.tags.map(t => <span class="tag">{t}</span>)}</div>
+          </a>
+        ))}
+      </section>
+
+      <section>
+        <h2>Guide</h2>
+        <a class="card" href="/guide">
+          <div class="card-title">How to Edit Your Site</div>
+          <div class="card-meta">markdown · frontmatter · git push → live</div>
         </a>
       </section>
 
