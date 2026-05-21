@@ -1,0 +1,41 @@
+---
+import { getCollection, render } from 'astro:content';
+
+export async function getStaticPaths() {
+  const entries = await getCollection('diary');
+  return entries.map(entry => ({ params: { id: entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>{entry.data.title} — Freddie's Diary</title>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { background: #0d0d0d; color: #c8c8c8; font-family: Georgia, serif; min-height: 100vh; padding: 60px 24px; }
+      .container { max-width: 680px; margin: 0 auto; }
+      .back { font-family: monospace; font-size: 0.75rem; color: #2e6040; text-decoration: none; letter-spacing: 2px; display: inline-block; margin-bottom: 40px; }
+      .back:hover { color: #00ff88; }
+      .date { font-family: monospace; font-size: 0.7rem; color: #00ff88; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 10px; }
+      h1 { font-size: 2rem; color: #e8e8e8; margin-bottom: 8px; }
+      .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 40px; }
+      .tag { font-family: monospace; font-size: 0.65rem; color: #00ff88; border: 1px solid #1a3d2a; border-radius: 20px; padding: 2px 8px; }
+      .content { font-size: 1rem; line-height: 1.9; color: #b8b8b8; border-left: 3px solid #00ff88; padding-left: 24px; }
+      .content p { margin-bottom: 1.2em; }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <a class="back" href="/">← back</a>
+      <div class="date">{entry.data.date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</div>
+      <h1>{entry.data.title}</h1>
+      <div class="tags">{entry.data.tags.map(t => <span class="tag">{t}</span>)}</div>
+      <div class="content"><Content /></div>
+    </div>
+  </body>
+</html>
