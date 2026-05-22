@@ -91,6 +91,14 @@ const revision = await getCollection('revision');
       </section>
 
       <section>
+        <h2>Employer's Assessment</h2>
+        <a class="card" href="/assessment">
+          <div class="card-title">Employer's Assessment</div>
+          <div class="card-meta">feedback · work experience · may 2026</div>
+        </a>
+      </section>
+
+      <section>
         <h2>Revision</h2>
         {revision.map(entry => (
           <a class="card" href={`/revision/${entry.id}`}>

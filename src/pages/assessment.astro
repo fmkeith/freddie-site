@@ -1,0 +1,199 @@
+---
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Employer's Assessment — Freddie Mason</title>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { background: #0d0d0d; color: #c8c8c8; font-family: Georgia, serif; min-height: 100vh; padding: 60px 24px 100px; }
+      .container { max-width: 780px; margin: 0 auto; }
+      .back { font-family: monospace; font-size: 0.75rem; color: #2e6040; text-decoration: none; letter-spacing: 2px; display: inline-block; margin-bottom: 40px; }
+      .back:hover { color: #00ff88; }
+      .label { font-family: monospace; font-size: 0.7rem; color: #00ff88; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 10px; }
+      h1 { font-size: 2rem; color: #e8e8e8; margin-bottom: 40px; }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      thead th {
+        font-family: monospace;
+        font-size: 0.7rem;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        color: #00ff88;
+        border-bottom: 1px solid #1a3d2a;
+        padding: 10px 16px;
+        text-align: left;
+      }
+
+      tbody tr {
+        border-bottom: 1px solid #111;
+        transition: background 0.15s;
+      }
+      tbody tr:hover { background: #0b1e0f; }
+
+      td {
+        padding: 14px 16px;
+        vertical-align: middle;
+      }
+
+      .cat {
+        font-family: Georgia, serif;
+        font-size: 0.95rem;
+        color: #c8c8c8;
+        width: 38%;
+      }
+
+      .score-cell { width: 22%; }
+
+      .stars {
+        display: flex;
+        gap: 4px;
+      }
+
+      .star {
+        font-size: 1.2rem;
+        color: #1a3d2a;
+        cursor: pointer;
+        transition: color 0.1s, transform 0.1s;
+        user-select: none;
+        line-height: 1;
+      }
+      .star:hover,
+      .star.active { color: #00ff88; }
+      .star:hover { transform: scale(1.2); }
+
+      .feedback-cell { width: 40%; }
+
+      .feedback-input {
+        width: 100%;
+        background: transparent;
+        border: none;
+        border-bottom: 1px solid #1a3d2a;
+        color: #c8c8c8;
+        font-family: Georgia, serif;
+        font-size: 0.88rem;
+        padding: 4px 2px;
+        outline: none;
+        transition: border-color 0.2s;
+      }
+      .feedback-input:focus { border-bottom-color: #00ff88; }
+      .feedback-input::placeholder { color: #2e6040; font-style: italic; }
+
+      .saved-note {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        font-family: monospace;
+        font-size: 0.7rem;
+        color: #00ff88;
+        letter-spacing: 1px;
+        opacity: 0;
+        transition: opacity 0.4s;
+        pointer-events: none;
+      }
+      .saved-note.show { opacity: 1; }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <a class="back" href="/">← back</a>
+      <div class="label">// work experience · may 2026</div>
+      <h1>Employer's Assessment</h1>
+
+      <table id="assessment-table">
+        <thead>
+          <tr>
+            <th>Category</th>
+            <th>Score</th>
+            <th>Feedback</th>
+          </tr>
+        </thead>
+        <tbody>
+          {[
+            'Timekeeping',
+            'Attendance',
+            'Enthusiasm',
+            'Personal Presentation',
+            'Communication',
+            'Teamwork',
+            'Ability to Solve Problems',
+          ].map((cat, i) => (
+            <tr>
+              <td class="cat">{cat}</td>
+              <td class="score-cell">
+                <div class="stars" data-row={i}>
+                  <span class="star" data-val="1">★</span>
+                  <span class="star" data-val="2">★</span>
+                  <span class="star" data-val="3">★</span>
+                  <span class="star" data-val="4">★</span>
+                  <span class="star" data-val="5">★</span>
+                </div>
+              </td>
+              <td class="feedback-cell">
+                <input class="feedback-input" type="text" placeholder="Add feedback…" data-row={i} />
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="saved-note" id="saved">saved ✓</div>
+
+    <script>
+      const STORE_KEY = 'employer-assessment';
+      let data = JSON.parse(localStorage.getItem(STORE_KEY) || '{}');
+
+      const saved = document.getElementById('saved');
+      let saveTimer;
+      function flashSaved() {
+        clearTimeout(saveTimer);
+        saved.classList.add('show');
+        saveTimer = setTimeout(() => saved.classList.remove('show'), 1400);
+      }
+
+      function persist() {
+        localStorage.setItem(STORE_KEY, JSON.stringify(data));
+        flashSaved();
+      }
+
+      function applyStars(starsEl, val) {
+        starsEl.querySelectorAll('.star').forEach(s => {
+          s.classList.toggle('active', parseInt(s.dataset.val) <= val);
+        });
+      }
+
+      document.querySelectorAll('.stars').forEach(starsEl => {
+        const row = starsEl.dataset.row;
+        const saved_val = data[`score-${row}`] || 0;
+        applyStars(starsEl, saved_val);
+
+        starsEl.querySelectorAll('.star').forEach(star => {
+          star.addEventListener('mouseenter', () => applyStars(starsEl, parseInt(star.dataset.val)));
+          star.addEventListener('mouseleave', () => applyStars(starsEl, data[`score-${row}`] || 0));
+          star.addEventListener('click', () => {
+            const val = parseInt(star.dataset.val);
+            data[`score-${row}`] = val;
+            applyStars(starsEl, val);
+            persist();
+          });
+        });
+      });
+
+      document.querySelectorAll('.feedback-input').forEach(input => {
+        const row = input.dataset.row;
+        input.value = data[`feedback-${row}`] || '';
+        input.addEventListener('input', () => {
+          data[`feedback-${row}`] = input.value;
+          persist();
+        });
+      });
+    </script>
+  </body>
+</html>
