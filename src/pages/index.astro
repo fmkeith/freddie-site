@@ -31,7 +31,7 @@ const revision = await getCollection('revision');
       }
       h1 { font-size: 2.4rem; color: #e8e8e8; line-height: 1.2; }
       h1 span { color: #00ff88; }
-      .sub { color: #4a7a5a; font-family: monospace; font-size: 0.8rem; margin-top: 10px; letter-spacing: 2px; }
+      .sub { color: #f0c040; font-family: monospace; font-size: 0.8rem; margin-top: 10px; letter-spacing: 2px; }
       section { margin-bottom: 48px; }
       h2 { font-size: 1rem; font-family: monospace; color: #00ff88; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 20px; border-bottom: 1px solid #1a3d2a; padding-bottom: 8px; }
       .card {
@@ -74,6 +74,19 @@ const revision = await getCollection('revision');
         <a class="card" href="/guide">
           <div class="card-title">How to Edit Your Site</div>
           <div class="card-meta">markdown · frontmatter · git push → live</div>
+        </a>
+      </section>
+
+      <section>
+        <h2>Projects</h2>
+        <a class="card" href="/game">
+          <div class="card-title">Simple FPS Game</div>
+          <div class="card-meta">three.js · WASD + mouse · click to shoot</div>
+          <div class="tags">
+            <span class="tag">three.js</span>
+            <span class="tag">browser</span>
+            <span class="tag">3d</span>
+          </div>
         </a>
       </section>
 

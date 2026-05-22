@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Simple FPS - Phase 1</title>
+<style>
+  body { margin: 0; overflow: hidden; font-family: system-ui, sans-serif; background: #000; }
+  #info {
+    position: absolute; top: 12px; left: 12px;
+    color: white; background: rgba(0,0,0,0.55);
+    padding: 8px 14px; border-radius: 6px;
+    font-size: 16px; pointer-events: none;
+  }
+  #crosshair {
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    color: white; font-size: 24px;
+    pointer-events: none;
+    text-shadow: 0 0 4px black;
+  }
+  #blocker {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    background: rgba(0,0,0,0.75);
+    color: white; cursor: pointer;
+    text-align: center;
+    z-index: 10;
+  }
+  #blocker h1 { margin: 0 0 8px; font-size: 32px; font-weight: 500; }
+  #blocker p { margin: 4px 0; opacity: 0.8; }
+  #hitflash {
+    position: absolute; inset: 0;
+    background: rgba(255, 50, 50, 0);
+    pointer-events: none;
+    transition: background 0.15s;
+  }
+</style>
+</head>
+<body>
+
+<div id="info">
+  Score: <span id="score">0</span> &nbsp; | &nbsp; Ammo: <span id="ammo">12</span>
+</div>
+<div id="crosshair">+</div>
+<div id="hitflash"></div>
+
+<div id="blocker">
+  <h1>Click to play</h1>
+  <p>WASD to move &nbsp; · &nbsp; Mouse to look &nbsp; · &nbsp; Click to shoot</p>
+  <p>R to reload &nbsp; · &nbsp; ESC to pause</p>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+// ---------- SCENE SETUP ----------
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x87CEEB);
+scene.fog = new THREE.Fog(0x87CEEB, 30, 80);
+
+const camera = new THREE.PerspectiveCamera(75, innerWidth/innerHeight, 0.1, 1000);
+camera.position.set(0, 1.7, 0);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(innerWidth, innerHeight);
+document.body.appendChild(renderer.domElement);
+
+// ---------- LIGHTING ----------
+scene.add(new THREE.AmbientLight(0xffffff, 0.55));
+const sun = new THREE.DirectionalLight(0xffffff, 0.7);
+sun.position.set(10, 20, 10);
+scene.add(sun);
+
+// ---------- FLOOR ----------
+const floor = new THREE.Mesh(
+  new THREE.PlaneGeometry(100, 100),
+  new THREE.MeshLambertMaterial({ color: 0x4a7c4e })
+);
+floor.rotation.x = -Math.PI / 2;
+scene.add(floor);
+
+// ---------- OBSTACLES (cover boxes) ----------
+const obstacles = [];
+for (let i = 0; i < 12; i++) {
+  const size = 1.5 + Math.random() * 1.5;
+  const box = new THREE.Mesh(
+    new THREE.BoxGeometry(size, size, size),
+    new THREE.MeshLambertMaterial({ color: 0x6b6b6b })
+  );
+  box.position.set(
+    (Math.random() - 0.5) * 50,
+    size / 2,
+    (Math.random() - 0.5) * 50
+  );
+  scene.add(box);
+  obstacles.push(box);
+}
+
+// ---------- TARGETS ----------
+const targets = [];
+function spawnTarget() {
+  const t = new THREE.Mesh(
+    new THREE.SphereGeometry(0.5, 16, 16),
+    new THREE.MeshLambertMaterial({ color: 0xff3333 })
+  );
+  t.position.set(
+    (Math.random() - 0.5) * 40,
+    1 + Math.random() * 2,
+    (Math.random() - 0.5) * 40
+  );
+  t.userData.bobOffset = Math.random() * Math.PI * 2;
+  t.userData.baseY = t.position.y;
+  scene.add(t);
+  targets.push(t);
+}
+for (let i = 0; i < 8; i++) spawnTarget();
+
+// ---------- GUN (held in hand) ----------
+const gun = new THREE.Mesh(
+  new THREE.BoxGeometry(0.15, 0.15, 0.6),
+  new THREE.MeshLambertMaterial({ color: 0x222222 })
+);
+gun.position.set(0.25, -0.2, -0.5);
+camera.add(gun);
+scene.add(camera);
+
+// ---------- POINTER LOCK ----------
+const blocker = document.getElementById('blocker');
+let isLocked = false;
+blocker.addEventListener('click', () => renderer.domElement.requestPointerLock());
+document.addEventListener('pointerlockchange', () => {
+  isLocked = document.pointerLockElement === renderer.domElement;
+  blocker.style.display = isLocked ? 'none' : 'flex';
+});
+
+// ---------- LOOK CONTROLS ----------
+let yaw = 0, pitch = 0;
+document.addEventListener('mousemove', (e) => {
+  if (!isLocked) return;
+  yaw -= e.movementX * 0.0022;
+  pitch -= e.movementY * 0.0022;
+  pitch = Math.max(-Math.PI / 2 + 0.05, Math.min(Math.PI / 2 - 0.05, pitch));
+});
+
+// ---------- MOVEMENT ----------
+const keys = {};
+document.addEventListener('keydown', e => keys[e.code] = true);
+document.addEventListener('keyup',   e => keys[e.code] = false);
+
+// ---------- SHOOTING ----------
+let score = 0;
+let ammo = 12;
+let reloading = false;
+
+function updateHUD() {
+  document.getElementById('score').textContent = score;
+  document.getElementById('ammo').textContent = reloading ? '...' : ammo;
+}
+
+function flashHit() {
+  const f = document.getElementById('hitflash');
+  f.style.background = 'rgba(255, 50, 50, 0.25)';
+  setTimeout(() => f.style.background = 'rgba(255, 50, 50, 0)', 100);
+}
+
+function shoot() {
+  if (!isLocked || reloading) return;
+  if (ammo <= 0) { reload(); return; }
+  ammo--;
+  updateHUD();
+
+  // little gun kick
+  gun.position.z = -0.4;
+  setTimeout(() => gun.position.z = -0.5, 60);
+
+  const ray = new THREE.Raycaster();
+  ray.setFromCamera({ x: 0, y: 0 }, camera);
+  const hits = ray.intersectObjects(targets);
+  if (hits.length > 0) {
+    const t = hits[0].object;
+    scene.remove(t);
+    targets.splice(targets.indexOf(t), 1);
+    score++;
+    updateHUD();
+    flashHit();
+    setTimeout(spawnTarget, 800);
+  }
+}
+
+function reload() {
+  if (reloading) return;
+  reloading = true;
+  updateHUD();
+  setTimeout(() => {
+    ammo = 12;
+    reloading = false;
+    updateHUD();
+  }, 1200);
+}
+
+document.addEventListener('mousedown', shoot);
+document.addEventListener('keydown', e => {
+  if (e.code === 'KeyR') reload();
+});
+
+// ---------- COLLISION (super simple) ----------
+function tryMove(dx, dz) {
+  const next = camera.position.clone();
+  next.x += dx;
+  next.z += dz;
+  // keep inside the floor
+  if (Math.abs(next.x) > 49 || Math.abs(next.z) > 49) return;
+  // don't walk through obstacles
+  for (const o of obstacles) {
+    const dxBox = Math.abs(next.x - o.position.x);
+    const dzBox = Math.abs(next.z - o.position.z);
+    const half = o.geometry.parameters.width / 2 + 0.4;
+    if (dxBox < half && dzBox < half) return;
+  }
+  camera.position.copy(next);
+}
+
+// ---------- GAME LOOP ----------
+const clock = new THREE.Clock();
+function animate() {
+  requestAnimationFrame(animate);
+  const dt = clock.getDelta();
+  const t = clock.elapsedTime;
+
+  // apply look
+  camera.rotation.order = 'YXZ';
+  camera.rotation.y = yaw;
+  camera.rotation.x = pitch;
+
+  // movement (player-relative)
+  const speed = 5 * dt;
+  const forward = new THREE.Vector3(-Math.sin(yaw), 0, -Math.cos(yaw));
+  const right   = new THREE.Vector3( Math.cos(yaw), 0, -Math.sin(yaw));
+  if (keys['KeyW']) tryMove(forward.x * speed, forward.z * speed);
+  if (keys['KeyS']) tryMove(-forward.x * speed, -forward.z * speed);
+  if (keys['KeyA']) tryMove(-right.x * speed, -right.z * speed);
+  if (keys['KeyD']) tryMove(right.x * speed, right.z * speed);
+
+  // bob targets so they're visible / a bit harder
+  for (const target of targets) {
+    target.position.y = target.userData.baseY + Math.sin(t * 2 + target.userData.bobOffset) * 0.3;
+  }
+
+  renderer.render(scene, camera);
+}
+animate();
+
+// ---------- RESIZE ----------
+addEventListener('resize', () => {
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+</script>
+</body>
+</html>
