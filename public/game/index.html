@@ -29,6 +29,22 @@
   }
   #blocker h1 { margin: 0 0 8px; font-size: 32px; font-weight: 500; }
   #blocker p { margin: 4px 0; opacity: 0.8; }
+  #home-btn {
+    display: inline-block;
+    margin-top: 28px;
+    padding: 8px 20px;
+    font-family: monospace;
+    font-size: 13px;
+    letter-spacing: 2px;
+    color: #00ff88;
+    border: 1px solid #00ff88;
+    border-radius: 4px;
+    text-decoration: none;
+    background: transparent;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+  }
+  #home-btn:hover { background: #00ff88; color: #0d0d0d; }
   #hitflash {
     position: absolute; inset: 0;
     background: rgba(255, 50, 50, 0);
@@ -49,6 +65,7 @@
   <h1>Click to play</h1>
   <p>WASD to move &nbsp; · &nbsp; Mouse to look &nbsp; · &nbsp; Click to shoot</p>
   <p>R to reload &nbsp; · &nbsp; ESC to pause</p>
+  <a id="home-btn" href="/">← back to home</a>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -127,7 +144,10 @@ scene.add(camera);
 // ---------- POINTER LOCK ----------
 const blocker = document.getElementById('blocker');
 let isLocked = false;
-blocker.addEventListener('click', () => renderer.domElement.requestPointerLock());
+blocker.addEventListener('click', (e) => {
+  if (e.target.id === 'home-btn') return;
+  renderer.domElement.requestPointerLock();
+});
 document.addEventListener('pointerlockchange', () => {
   isLocked = document.pointerLockElement === renderer.domElement;
   blocker.style.display = isLocked ? 'none' : 'flex';

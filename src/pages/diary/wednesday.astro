@@ -1,244 +1,36 @@
 ---
+import { getEntry, render } from 'astro:content';
+
+const entry = await getEntry('diary', 'wednesday');
+const { Content } = await render(entry);
 ---
 
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
-    <title>Wednesday — Freddie's Diary</title>
+    <title>{entry.data.title} — Freddie's Diary</title>
     <style>
       * { margin: 0; padding: 0; box-sizing: border-box; }
-
-      body {
-        background: #d6d0c4;
-        min-height: 100vh;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding: 40px 24px 80px;
-        font-family: Georgia, serif;
-      }
-
-      .back {
-        align-self: flex-start;
-        font-family: monospace;
-        font-size: 0.75rem;
-        color: #6b6b6b;
-        text-decoration: none;
-        letter-spacing: 2px;
-        margin-bottom: 32px;
-      }
-      .back:hover { color: #222; }
-
-      /* ── 3D scene ── */
-      .scene {
-        perspective: 2000px;
-        width: 100%;
-        max-width: 680px;
-      }
-
-      .notebook {
-        position: relative;
-        width: 100%;
-        height: 900px;
-      }
-
-      .sheet {
-        position: absolute;
-        inset: 0;
-        transform-origin: left center;
-        transform-style: preserve-3d;
-        transition: transform 1.3s cubic-bezier(0.77, 0, 0.175, 1);
-      }
-
-      #page1 { z-index: 2; }
-      #page2 { z-index: 1; }
-
-      #page1.flipped { transform: rotateY(-180deg); }
-
-      /* ── paper skin ── */
-      .paper {
-        width: 100%;
-        height: 100%;
-        background: #fdfaf3;
-        border-radius: 2px;
-        box-shadow:
-          0 4px 6px rgba(0,0,0,0.1),
-          0 10px 30px rgba(0,0,0,0.15);
-        padding: 60px 64px 80px 96px;
-        position: relative;
-        overflow-y: auto;
-        backface-visibility: hidden;
-
-        /* ruled lines */
-        background-image:
-          linear-gradient(rgba(220,80,80,0.35) 0, rgba(220,80,80,0.35) 1px, transparent 1px),
-          linear-gradient(#c8d8e8 0, #c8d8e8 1px, transparent 1px);
-        background-size: 100% 60px, 100% 30px;
-        background-position: 0 118px, 0 118px;
-      }
-
-      /* red margin line */
-      .paper::before {
-        content: '';
-        position: absolute;
-        top: 0; bottom: 0; left: 72px;
-        width: 1px;
-        background: rgba(220,80,80,0.35);
-        pointer-events: none;
-      }
-
-      .date {
-        font-family: monospace;
-        font-size: 0.72rem;
-        color: #b0a080;
-        letter-spacing: 2px;
-        text-transform: uppercase;
-        margin-bottom: 8px;
-      }
-
-      h1 {
-        font-size: 1.8rem;
-        color: #2a2a2a;
-        line-height: 1.25;
-        margin-bottom: 40px;
-      }
-
-      textarea {
-        width: 100%;
-        border: none;
-        background: transparent;
-        font-family: Georgia, serif;
-        font-size: 1rem;
-        color: #1a1a1a;
-        line-height: 30px;
-        resize: none;
-        outline: none;
-        height: 600px;
-        caret-color: #c05050;
-      }
-
-      textarea::placeholder {
-        color: #c0b898;
-        font-style: italic;
-      }
-
-      /* ── flip tab ── */
-      .flip-tab {
-        position: absolute;
-        bottom: 20px;
-        right: 20px;
-        font-family: monospace;
-        font-size: 0.68rem;
-        color: #b0a070;
-        letter-spacing: 1px;
-        cursor: pointer;
-        user-select: none;
-        padding: 6px 12px;
-        border: 1px dashed #c8b880;
-        border-radius: 3px;
-        transition: color 0.2s, border-color 0.2s;
-      }
-      .flip-tab:hover { color: #7a5a20; border-color: #7a5a20; }
-
-      .flip-tab.back { right: auto; left: 20px; }
-
-      /* ── saved note ── */
-      .saved-note {
-        position: fixed;
-        bottom: 24px;
-        right: 24px;
-        font-family: monospace;
-        font-size: 0.7rem;
-        color: #888;
-        letter-spacing: 1px;
-        opacity: 0;
-        transition: opacity 0.4s;
-        pointer-events: none;
-      }
-      .saved-note.show { opacity: 1; }
+      body { background: #0d0d0d; color: #c8c8c8; font-family: Georgia, serif; min-height: 100vh; padding: 60px 24px; }
+      .container { max-width: 680px; margin: 0 auto; }
+      .back { font-family: monospace; font-size: 0.75rem; color: #2e6040; text-decoration: none; letter-spacing: 2px; display: inline-block; margin-bottom: 40px; }
+      .back:hover { color: #00ff88; }
+      .date { font-family: monospace; font-size: 0.7rem; color: #00ff88; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 10px; }
+      h1 { font-size: 2rem; color: #e8e8e8; margin-bottom: 8px; }
+      .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 40px; }
+      .tag { font-family: monospace; font-size: 0.65rem; color: #00ff88; border: 1px solid #1a3d2a; border-radius: 20px; padding: 2px 8px; }
+      .content { font-size: 1rem; line-height: 1.9; color: #b8b8b8; border-left: 3px solid #00ff88; padding-left: 24px; }
+      .content p { margin-bottom: 1.2em; }
     </style>
   </head>
   <body>
-    <a class="back" href="/">← back</a>
-
-    <div class="scene">
-      <div class="notebook">
-
-        <!-- Page 2 — underneath -->
-        <div class="sheet" id="page2">
-          <div class="paper">
-            <h1>Wednesday 20th May</h1>
-            <textarea id="entry2" placeholder="Start writing here..."></textarea>
-            <div class="flip-tab back" id="back-tab">‹ previous page</div>
-          </div>
-        </div>
-
-        <!-- Page 1 — on top -->
-        <div class="sheet" id="page1">
-          <div class="paper">
-            <div class="date">Wednesday, 20 May 2026</div>
-            <h1>Foundations &amp; First Win</h1>
-            <textarea id="entry1" placeholder="Start writing here..."></textarea>
-            <div class="flip-tab" id="flip-tab">turn page ›</div>
-          </div>
-        </div>
-
-      </div>
+    <div class="container">
+      <a class="back" href="/">← back</a>
+      <div class="date">{entry.data.date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</div>
+      <h1>{entry.data.title}</h1>
+      <div class="tags">{entry.data.tags.map(t => <span class="tag">{t}</span>)}</div>
+      <div class="content"><Content /></div>
     </div>
-
-    <div class="saved-note" id="saved">saved ✓</div>
-
-    <script>
-      const page1 = document.getElementById('page1');
-      const flipTab = document.getElementById('flip-tab');
-      const backTab = document.getElementById('back-tab');
-      const saved = document.getElementById('saved');
-      let flipped = false;
-      let busy = false;
-      const ANIM = 1300;
-
-      function flip() {
-        if (busy) return;
-        busy = true;
-        flipped = !flipped;
-        page1.classList.toggle('flipped', flipped);
-        setTimeout(() => busy = false, ANIM);
-      }
-
-      flipTab.addEventListener('click', flip);
-      backTab.addEventListener('click', flip);
-
-      // auto-save
-      let timer;
-      function showSaved() {
-        clearTimeout(timer);
-        saved.classList.add('show');
-        timer = setTimeout(() => saved.classList.remove('show'), 1500);
-      }
-
-      ['entry1', 'entry2'].forEach(id => {
-        const ta = document.getElementById(id);
-        const key = 'diary-' + id;
-        ta.value = localStorage.getItem(key) || '';
-        ta.addEventListener('input', () => {
-          localStorage.setItem(key, ta.value);
-          showSaved();
-        });
-        // auto-capitalise after full stop
-        ta.addEventListener('keydown', (e) => {
-          if (e.key.length === 1 && /[a-z]/i.test(e.key) && !e.ctrlKey && !e.metaKey) {
-            const before = ta.value.substring(0, ta.selectionStart);
-            if (/\.\s+$/.test(before)) {
-              e.preventDefault();
-              const pos = ta.selectionStart;
-              ta.value = ta.value.substring(0, pos) + e.key.toUpperCase() + ta.value.substring(ta.selectionEnd);
-              ta.selectionStart = ta.selectionEnd = pos + 1;
-              ta.dispatchEvent(new Event('input'));
-            }
-          }
-        });
-      });
-    </script>
   </body>
 </html>
